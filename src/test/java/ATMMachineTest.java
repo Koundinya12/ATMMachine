@@ -1,14 +1,11 @@
-import DTO.Denomination;
+import dto.Denomination;
 import junit.framework.TestCase;
-import models.ATMMachine;
+import core.ATMMachine;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.concurrent.*;
 
 import static org.junit.Assert.*;
@@ -45,7 +42,7 @@ public class ATMMachineTest extends TestCase {
     //Test case to perform validation against concurrent withdrawal by 2 customers
     @Test
     public void test_ConcurrentWithdrawal() throws InterruptedException, ExecutionException {
-        int[] withdrawals={1600,2800,3700};
+        int[] withdrawals={1600,2800,1500};
         List<Denomination> denominationList=new ArrayList<>();
         ExecutorService executor= Executors.newFixedThreadPool(withdrawals.length);
         for(int x:withdrawals)
@@ -53,18 +50,23 @@ public class ATMMachineTest extends TestCase {
             Callable<List<Denomination>> callable=()->atmMachine.withdraw(x);
             Future<List<Denomination>> future=executor.submit(callable);
             denominationList=future.get();
-            //Testing denomination for withdrawal of 1600
-            if(x==1600)
-            {
-                assertTrue("Denominations are incorrect",denominationList.contains(new Denomination(500,3)));
-                assertTrue("Denominations are incorrect",denominationList.contains(new Denomination(100,1)));
-            }
         }
         executor.shutdown();
         boolean flag=executor.awaitTermination(1, TimeUnit.MINUTES);
         assertTrue("Executor should terminate within the given time", flag);
+        atmMachine.printDenominations();
+        int noOf500=atmMachine.denominations.get(500);
+        int noOf200=atmMachine.denominations.get(200);
+        int noOf100=atmMachine.denominations.get(100);
+        assertEquals(1,noOf500);
+        assertEquals(5,noOf200);
+        assertEquals(7,noOf100);
+
+
+
         //assertTrue("Denominations are incorrect",denominationList.contains(new Denomination(500,3)));
-        assertEquals( "Balance should be 0 after concurrent withdrawals",0,atmMachine.getBalance());
+        //assertTrue("Denominations are incorrect",denominationList.contains(new Denomination(100,1)));
+        assertEquals( 2200,atmMachine.getBalance());
     }
     //Test case to perform validation against concurrent withdrawal by 2 customers with exceeding Balance
     @Test

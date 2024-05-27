@@ -1,19 +1,20 @@
-package models;
+package core;
 
-import DTO.Denomination;
+import dto.Denomination;
 import exceptions.IncorrectAmountException;
 import exceptions.InsufficientBalanceException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
-import static application.Main.logger;
-
+//This class is responsible for initialising denominations and to perform withdrawals
 public class ATMMachine{
-    //Use of TreeMap is to have denominations in decreasing order so as to dispense minimum notes
+
     public TreeMap<Integer,Integer> denominations;
+    public static final Logger logger = LogManager.getLogger(ATMMachine.class);
     int balance;
 
-    //Constructor to Initialize our TreeMap with pre-defined denominations
     public ATMMachine(){
         this.balance=0;
         denominations=new TreeMap<>(Collections.reverseOrder());
@@ -23,23 +24,13 @@ public class ATMMachine{
         denominations.put(100,9);
         getBalance();
     }
-    //Helper function to check number of notes we are left with before and after transaction
-    public void printDenominations()
-    {
-        for(Map.Entry<Integer,Integer> entrySet:denominations.entrySet()){
-            System.out.println(entrySet.getKey()+" "+entrySet.getValue());
-        }
-    }
-
     //Method to check Balance available in the ATM Machine
     public int getBalance()
     {
-        int availableBalance=0;
-        availableBalance= denominations.entrySet().stream().mapToInt(x->x.getKey()*x.getValue()).sum();
-        this.balance=availableBalance;
-        return balance;
+        this.balance=denominations.entrySet().stream().mapToInt(den->den.getKey()*den.getValue()).sum();
+        return this.balance;
     }
-    public void isWithdrawalPossible(int amount){
+    public void validateWithdrawal(int amount){
         if (!(amount % 100 == 0)) {
             logger.error("Amount not supported for withdrawal,");
             throw new IncorrectAmountException("Incorrect amount Exception, please enter amount in multiples of 100");
@@ -53,7 +44,7 @@ public class ATMMachine{
     //Method to withdraw amount from ATM Machine
     public synchronized List<Denomination> withdraw(int amount) throws IncorrectAmountException, InsufficientBalanceException {
         //Throw error if withdrawal amount is not in multiples of 100
-        isWithdrawalPossible(amount);
+        validateWithdrawal(amount);
         List<Denomination> denominationList=new ArrayList<>();
         int remainingBalance = amount;
         //Iterating the denominations and updating the denominations
@@ -79,7 +70,6 @@ public class ATMMachine{
                 if (remainingBalance == 0) break;
             }
         }
-        this.balance -= amount;
         return denominationList;
     }
 }

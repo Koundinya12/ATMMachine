@@ -54,7 +54,6 @@ public class ATMMachineTest extends TestCase {
         executor.shutdown();
         boolean flag=executor.awaitTermination(1, TimeUnit.MINUTES);
         assertTrue("Executor should terminate within the given time", flag);
-        atmMachine.printDenominations();
         int noOf500=atmMachine.denominations.get(500);
         int noOf200=atmMachine.denominations.get(200);
         int noOf100=atmMachine.denominations.get(100);

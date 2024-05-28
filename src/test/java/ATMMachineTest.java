@@ -18,12 +18,12 @@ public class ATMMachineTest extends TestCase {
     public void setUp (){
         atmMachine=new ATMMachine();
     }
-    //Test case to perform validation against the intial balance
+
     @Test
     public void testIntitalBalance(){
         assertEquals(8100,atmMachine.getBalance());
     }
-    //Test case to perform validation against successfull withdrawal
+
     @Test
     public void testSuccessWithdrawal(){
         List<Denomination> denominationList=atmMachine.withdraw(1100);
@@ -31,7 +31,7 @@ public class ATMMachineTest extends TestCase {
         assertTrue("Denominations are incorrect",denominationList.contains(new Denomination(500,2)));
         assertTrue("Denominations are incorrect",denominationList.contains(new Denomination(100,1)));
     }
-    //Test case to perform validation against Insufficient balance
+
     @Test
     public void testInsufficientBalance(){
         Exception exception=assertThrows(RuntimeException.class,()->{
@@ -39,7 +39,7 @@ public class ATMMachineTest extends TestCase {
         });
         assertEquals("Insufficient balance, please try again",exception.getMessage());
     }
-    //Test case to perform validation against concurrent withdrawal by 2 customers
+
     @Test
     public void test_ConcurrentWithdrawal() throws InterruptedException, ExecutionException {
         int[] withdrawals={1600,2800,1500};
@@ -60,14 +60,9 @@ public class ATMMachineTest extends TestCase {
         assertEquals(1,noOf500);
         assertEquals(5,noOf200);
         assertEquals(7,noOf100);
-
-
-
-        //assertTrue("Denominations are incorrect",denominationList.contains(new Denomination(500,3)));
-        //assertTrue("Denominations are incorrect",denominationList.contains(new Denomination(100,1)));
         assertEquals( 2200,atmMachine.getBalance());
     }
-    //Test case to perform validation against concurrent withdrawal by 2 customers with exceeding Balance
+
     @Test
     public void testConcurrentWithdrawalExceedingBalance() throws InterruptedException{
         ExecutorService executor= Executors.newFixedThreadPool(2);

@@ -35,7 +35,6 @@ public class ATMMachine{
             logger.error("Amount not supported for withdrawal,");
             throw new IncorrectAmountException("Incorrect amount Exception, please enter amount in multiples of 100");
         }
-        //Throw error if withdrawal amount is greater than available balance
         if (amount > balance) {
             logger.error("Insufficient balance");
             throw new InsufficientBalanceException("Insufficient balance, please try again");
@@ -43,11 +42,9 @@ public class ATMMachine{
     }
     //Method to withdraw amount from ATM Machine
     public synchronized List<Denomination> withdraw(int amount) throws IncorrectAmountException, InsufficientBalanceException {
-        //Throw error if withdrawal amount is not in multiples of 100
         validateWithdrawal(amount);
         List<Denomination> denominationList=new ArrayList<>();
         int remainingBalance = amount;
-        //Iterating the denominations and updating the denominations
         Iterator<Integer> integerIterator = this.denominations.keySet().iterator();
         while (integerIterator.hasNext()) {
             int denomination = integerIterator.next();

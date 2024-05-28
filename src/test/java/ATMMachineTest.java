@@ -7,11 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-
-
 public class ATMMachineTest {
     private ATMMachine atmMachine;
-
 
     @BeforeEach
     public void setUp (){
@@ -42,23 +39,23 @@ public class ATMMachineTest {
     @Test
     public void test_ConcurrentWithdrawal() throws InterruptedException, ExecutionException {
         int[] withdrawals={1600,2800,1500};
-        List<Denomination> denominationList=new ArrayList<>();
         ExecutorService executor= Executors.newFixedThreadPool(withdrawals.length);
-        for(int x:withdrawals)
+        List<Callable<List<Denomination>>> callables=new ArrayList<>();
+        for(int amount:withdrawals)
         {
-            Callable<List<Denomination>> callable=()->atmMachine.withdraw(x);
-            Future<List<Denomination>> future=executor.submit(callable);
-            denominationList=future.get();
+            Callable<List<Denomination>> callable=()->atmMachine.withdraw(amount);
+            callables.add(callable);
+        }
+        List<Future<List<Denomination>>> futures= executor.invokeAll(callables);
+        for(Future<List<Denomination>> future:futures) {
+             future.get();
         }
         executor.shutdown();
         boolean flag=executor.awaitTermination(1, TimeUnit.MINUTES);
         assertTrue(flag, "Executor should terminate within the given time");
-        int noOf500=atmMachine.denominations.get(500);
-        int noOf200=atmMachine.denominations.get(200);
-        int noOf100=atmMachine.denominations.get(100);
-        assertEquals(1,noOf500);
-        assertEquals(5,noOf200);
-        assertEquals(7,noOf100);
+        assertEquals(1,atmMachine.denominations.get(500));
+        assertEquals(5,atmMachine.denominations.get(200));
+        assertEquals(7,atmMachine.denominations.get(100));
         assertEquals( 2200,atmMachine.getBalance());
     }
 
@@ -74,6 +71,5 @@ public class ATMMachineTest {
         assertTrue(flag, "Executor should terminate within the given time");
         assertTrue(atmMachine.getBalance()>=0, "Balance should not be less than 0 after concurrent withdrawals");
     }
-
 
 }

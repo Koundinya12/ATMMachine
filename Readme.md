@@ -45,6 +45,7 @@ Develop a cash withdrawal function for an ATM. Ensure that the solution:
 ## Assumptions
 1. We have assumed the denominations are always in multiples of 100.
 2. We have assumed three different denominations available which are 500,200,100.
+3. I haven't included application_logs.log file. This can be generated once we run our application
 
 ## Testing the Application
 1. Application is tested using JDK 22

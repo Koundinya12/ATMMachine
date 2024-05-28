@@ -5,42 +5,53 @@ import exceptions.IncorrectAmountException;
 import exceptions.InsufficientBalanceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import java.util.*;
 
-//This class is responsible for initialising denominations and to perform withdrawals
+/**
+ * This class is responsible for initialising denominations and to perform withdrawals
+ */
 public class ATMMachine{
 
     public TreeMap<Integer,Integer> denominations;
     public static final Logger logger = LogManager.getLogger(ATMMachine.class);
-    int balance;
+
 
     public ATMMachine(){
-        this.balance=0;
         denominations=new TreeMap<>(Collections.reverseOrder());
         //Assumed denominations are 500,200,100
         denominations.put(500,12);
         denominations.put(200,6);
         denominations.put(100,9);
-        getBalance();
     }
-    //Method to check Balance available in the ATM Machine
-    public int getBalance()
+
+    /**
+     * Method to check Balance available in the ATM Machine
+     * @return ATM balance
+     */
+    public long getBalance()
     {
-        this.balance=denominations.entrySet().stream().mapToInt(den->den.getKey()*den.getValue()).sum();
-        return this.balance;
+        return denominations.entrySet().stream().mapToLong(den->(long)den.getKey()*den.getValue()).sum();
+
     }
+
     public void validateWithdrawal(int amount){
         if (!(amount % 100 == 0)) {
             logger.error("Amount not supported for withdrawal,");
             throw new IncorrectAmountException("Incorrect amount Exception, please enter amount in multiples of 100");
         }
-        if (amount > balance) {
+        if (amount > getBalance()) {
             logger.error("Insufficient balance");
             throw new InsufficientBalanceException("Insufficient balance, please try again");
         }
     }
-    //Method to withdraw amount from ATM Machine
+
+    /**
+     * This method is called to withdraw the amount
+     * @param amount
+     * @return List<Denomination>
+     * @throws IncorrectAmountException
+     * @throws InsufficientBalanceException
+     */
     public synchronized List<Denomination> withdraw(int amount) throws IncorrectAmountException, InsufficientBalanceException {
         validateWithdrawal(amount);
         List<Denomination> denominationList=new ArrayList<>();

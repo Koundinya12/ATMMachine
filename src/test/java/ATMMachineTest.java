@@ -1,20 +1,19 @@
 import dto.Denomination;
-import junit.framework.TestCase;
 import core.ATMMachine;
-import org.junit.Before;
-import org.junit.Test;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-import static org.junit.Assert.*;
 
-public class ATMMachineTest extends TestCase {
+
+public class ATMMachineTest {
     private ATMMachine atmMachine;
 
 
-    @Before
+    @BeforeEach
     public void setUp (){
         atmMachine=new ATMMachine();
     }
@@ -28,8 +27,8 @@ public class ATMMachineTest extends TestCase {
     public void testSuccessWithdrawal(){
         List<Denomination> denominationList=atmMachine.withdraw(1100);
         assertEquals(7000,atmMachine.getBalance());
-        assertTrue("Denominations are incorrect",denominationList.contains(new Denomination(500,2)));
-        assertTrue("Denominations are incorrect",denominationList.contains(new Denomination(100,1)));
+        assertTrue(denominationList.contains(new Denomination(500,2)), "Denominations are incorrect");
+        assertTrue(denominationList.contains(new Denomination(100,1)), "Denominations are incorrect");
     }
 
     @Test
@@ -53,7 +52,7 @@ public class ATMMachineTest extends TestCase {
         }
         executor.shutdown();
         boolean flag=executor.awaitTermination(1, TimeUnit.MINUTES);
-        assertTrue("Executor should terminate within the given time", flag);
+        assertTrue(flag, "Executor should terminate within the given time");
         int noOf500=atmMachine.denominations.get(500);
         int noOf200=atmMachine.denominations.get(200);
         int noOf100=atmMachine.denominations.get(100);
@@ -72,8 +71,8 @@ public class ATMMachineTest extends TestCase {
         executor.submit(r2);
         executor.shutdown();
         boolean flag=executor.awaitTermination(1, TimeUnit.MINUTES);
-        assertTrue("Executor should terminate within the given time", flag);
-        assertTrue( "Balance should not be less than 0 after concurrent withdrawals",atmMachine.getBalance()>=0);
+        assertTrue(flag, "Executor should terminate within the given time");
+        assertTrue(atmMachine.getBalance()>=0, "Balance should not be less than 0 after concurrent withdrawals");
     }
 
 

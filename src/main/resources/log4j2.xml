@@ -18,9 +18,5 @@
             <AppenderRef ref="ConsoleAppender" />
             <AppenderRef ref="FileAppender" />
         </Root>
-        <!-- Logger for specific package -->
-        <Logger name="com.example.myapp" level="debug">
-            <AppenderRef ref="FileAppender" />
-        </Logger>
     </Loggers>
 </Configuration>
